@@ -1,0 +1,4 @@
+create folder structures dist and src
+src ->css file contains @import "tailwindcss"; 
+npm install tailwindcss @tailwindcss/cli
+npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --watch
