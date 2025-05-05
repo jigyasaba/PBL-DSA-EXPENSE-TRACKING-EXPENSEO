@@ -2,221 +2,380 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expenseo - Expense Tracker</title>
-  <link rel="stylesheet" href="second.css">
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Expenseo - The Budget Buddy</title>
   <style>
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .animate-pulse-custom {
-      animation: pulse 2s infinite;
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
     }
+
+    /* Full-screen Background Video */
+    .background-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    header {
+      width: 100%;
+      text-align: center;
+      padding: 20px 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: bold;
+      font-style: italic;
+      color: #2c3e50;
+    }
+
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      background-color: #1e293b;
+      padding-top: 100px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      background-color: transparent;
+      color: #e2e8f0;
+      font-size: 1rem;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s, padding-left 0.3s;
+    }
+
+    .sidebar button:hover {
+      background-color: #334155;
+      padding-left: 30px;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 120px 20px 20px;
+      z-index: 1;
+    }
+
+    form, .page-section {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      max-width: 500px;
+      font-size: 1.1rem;
+      animation: zoomIn 0.3s ease;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    form input,
+    form label {
+      display: block;
+      width: 100%;
+      margin-bottom: 18px;
+      font-size: 1.1rem;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="tel"] {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    form button {
+      padding: 12px 20px;
+      background-color: #1e40af;
+      color: #fff;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background-color: #1e3a8a;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .error {
+      color: red;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.8; /* optional: adjust for visibility */
+}
+
+.top-right-logo {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.icon-btn img {
+  width: 50px;
+  height: 50px;
+  transition: transform 0.5s ease;
+}
+
+.icon-btn:hover img {
+  transform: scale(1.3);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background-color: #fff;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  z-index: 2;
+  border-radius: 8px;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.show {
+  display: block;
+}
+.sidebar button:nth-child(4) {
+  background-color: #b91c1c; /* red */
+  color: white;
+}
+
+.sidebar button:nth-child(4):hover {
+  background-color: #991b1b;
+  padding-left: 30px;
+}
+
+
+
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
-  <div>
-    <img src="./resources/piggy-bank.gif" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-auto opacity-80 z-0" />
-  </div>
-  <div class="container mx-auto p-4">
-    <!-- Animated Card -->
-    <div class="flex justify-end mb-4">
-      <a href="dummy.html" class="relative bg-[#8B78E6] text-white px-6 py-4 rounded-lg shadow-lg animate-pulse-custom hover:shadow-xl transition duration-300">
-        Know where you are spending
-        <span class="absolute top-0 right-0 mt-2 mr-2 text-sm">→</span>
-      </a>
-    </div>
+<body>
 
-    <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-4 mb-4">
-      <button id="addExpenseBtn" class="bg-[#8B78E6] text-white px-4 py-2 rounded hover:bg-[#7a68d6] transition duration-300">
-        Add Expense
-      </button>
-      <button id="deleteExpenseBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">
-        Delete Last Expense
-      </button>
-      <button id="undoDeleteBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300">
-        Undo Delete
-      </button>
-    </div>
+<video class="background-video" autoplay muted loop>
+  <source src="resources/video.mp4" type="video/mp4">
+  video cant run 
+</video>
 
-    <!-- Filters -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 space-y-4 md:space-y-0">
-      <div>
-        <label for="dateFilter" class="block mb-1 font-semibold">Filter by Date:</label>
-        <select id="dateFilter" class="w-full md:w-48 border border-gray-300 rounded px-3 py-2">
-          <option value="all">All</option>
-          <option value="daily">Daily</option>
-          <option value="monthly">Monthly</option>
-          <option value="yearly">Yearly</option>
-        </select>
-      </div>
-      <div>
-        <label for="categoryFilter" class="block mb-1 font-semibold">Filter by Category:</label>
-        <select id="categoryFilter" class="w-full md:w-48 border border-gray-300 rounded px-3 py-2">
-          <option value="all">All</option>
-          <option value="food">Food</option>
-          <option value="transport">Transport</option>
-          <option value="utilities">Utilities</option>
-          <option value="entertainment">Entertainment</option>
-        </select>
+  <header>
+    <h1>Expenseo - The Budget Buddy</h1>
+    <div class="dropdown top-right-logo">
+      <button onclick="toggleDropdown()" class="icon-btn">
+        <img src="resources/k.jpg" alt="Logo">
+      </button>
+      <div id="myDropdown" class="dropdown-content">
+        <a href="https://example.com/insights">Get Insights About Your Expenses</a>
+        <a href="https://example.com/view">View</a>
+        <a href="https://example.com/delete">Delete</a>
       </div>
     </div>
+    
+  </header>
 
-    <!-- Expenses Table -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
-        <thead class="bg-[#8B78E6] text-white">
-          <tr>
-            <th class="py-3 px-4 text-left">S.No</th>
-            <th class="py-3 px-4 text-left">Name of Expense</th>
-            <th class="py-3 px-4 text-left">Category</th>
-            <th class="py-3 px-4 text-left">Date</th>
-            <th class="py-3 px-4 text-left">Total Money Spent</th>
-          </tr>
-        </thead>
-        <tbody id="expenseTableBody"></tbody>
-      </table>
-    </div>
-  </div>
+  <nav class="sidebar">
+    <button onclick="showDividedExpense()">Divided Expense</button>
+    <button onclick="showViewExpenses()">View Expenses</button>
+    <button onclick="showLoginForm()">Login</button>
+    <button onclick="showSignupForm()">Signup</button>
+    <button onclick="logout()">Logout</button>
+  
+  </nav>
 
-  <!-- Add Expense Modal -->
-  <div id="addExpenseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white p-6 rounded shadow-lg w-96">
-      <h2 class="text-xl font-bold mb-4">Add New Expense</h2>
-      <form id="expenseForm" class="space-y-4">
-        <div>
-          <label for="expenseName" class="block text-sm font-medium text-gray-700">Name of Expense</label>
-          <input type="text" id="expenseName" required class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
-        </div>
-        <div>
-          <label for="expenseCategory" class="block text-sm font-medium text-gray-700">Category</label>
-          <select id="expenseCategory" required class="mt-1 block w-full border border-gray-300 rounded px-3 py-2">
-            <option value="food">Food</option>
-            <option value="transport">Transport</option>
-            <option value="utilities">Utilities</option>
-            <option value="entertainment">Entertainment</option>
-          </select>
-        </div>
-        <div>
-          <label for="expenseDate" class="block text-sm font-medium text-gray-700">Date</label>
-          <input type="date" id="expenseDate" required class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
-        </div>
-        <div>
-          <label for="expenseAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-          <input type="number" id="expenseAmount" required class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
-        </div>
-        <div class="flex justify-end space-x-2">
-          <button type="button" id="cancelBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
-          <button type="submit" class="bg-[#8B78E6] text-white px-4 py-2 rounded hover:bg-[#7a68d6]">Add</button>
-        </div>
-      </form>
+  <div class="main-content">
+
+    <!-- Signup Form -->
+    <form id="signupForm" class="hidden" onsubmit="return validateSignup()">
+      <h2 style="font-size: 1.8rem; margin-bottom: 20px;">Signup</h2>
+      <input type="text" id="fullname" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+      <input type="tel" id="phone" placeholder="Phone Number" required />
+      <label>
+        <input type="checkbox" id="terms" required />
+        I accept the terms and conditions
+      </label>
+      <div class="error" id="signupError"></div>
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="hidden" onsubmit="return validateLogin()">
+      <h2 style="font-size: 1.8rem; margin-bottom: 20px;">Login</h2>
+      <input type="text" id="loginName" placeholder="Name" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <div class="error" id="loginError"></div>
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- Divided Expense Page -->
+    <div id="dividedExpensePage" class="page-section hidden">
+      <h2 style="font-size: 1.8rem;">Divided Expense Page</h2>
+      <p>This is where you can divide your expenses with others.</p>
     </div>
+
+    <!-- View Expenses Page -->
+    <div id="viewExpensesPage" class="page-section hidden">
+      <h2 style="font-size: 1.8rem;">View Expenses</h2>
+      <p>This is where your tracked expenses will be shown.</p>
+    </div>
+
   </div>
 
   <script>
-    let expenses = [
-      { name: "Groceries", category: "food", date: "2025-04-30", amount: 1500 },
-      { name: "Bus Ticket", category: "transport", date: "2025-04-29", amount: 50 },
-      { name: "Electricity Bill", category: "utilities", date: "2025-04-28", amount: 1200 },
-      { name: "Movie", category: "entertainment", date: "2025-04-27", amount: 300 }
-    ];
+    function toggleDropdown() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
 
-    let deletedExpenses = [];
+window.addEventListener('click', function(event) {
+  if (!event.target.closest('.dropdown')) {
+    document.getElementById("myDropdown").classList.remove("show");
+  }
+});
 
-    const expenseTableBody = document.getElementById("expenseTableBody");
-    const dateFilter = document.getElementById("dateFilter");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const addExpenseBtn = document.getElementById("addExpenseBtn");
-    const deleteExpenseBtn = document.getElementById("deleteExpenseBtn");
-    const undoDeleteBtn = document.getElementById("undoDeleteBtn");
-    const addExpenseModal = document.getElementById("addExpenseModal");
-    const cancelBtn = document.getElementById("cancelBtn");
-    const expenseForm = document.getElementById("expenseForm");
-
-    function renderExpenses(data) {
-      expenseTableBody.innerHTML = "";
-      data.forEach((exp, index) => {
-        const row = document.createElement("tr");
-        row.className = "hover:bg-gray-100 transition duration-200";
-        row.innerHTML = `
-          <td class="py-2 px-4 border-b">${index + 1}</td>
-          <td class="py-2 px-4 border-b">${exp.name}</td>
-          <td class="py-2 px-4 border-b">${exp.category}</td>
-          <td class="py-2 px-4 border-b">${exp.date}</td>
-          <td class="py-2 px-4 border-b">₹${exp.amount}</td>
-        `;
-        expenseTableBody.appendChild(row);
-      });
+    function hideAllSections() {
+      document.getElementById('signupForm').classList.add('hidden');
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('dividedExpensePage').classList.add('hidden');
+      document.getElementById('viewExpensesPage').classList.add('hidden');
     }
 
-    function filterExpenses() {
-      let filtered = [...expenses];
-      const category = categoryFilter.value;
-      const dateOption = dateFilter.value;
-      const today = new Date();
-
-      if (category !== "all") {
-        filtered = filtered.filter(exp => exp.category === category);
-      }
-
-      if (dateOption !== "all") {
-        filtered = filtered.filter(exp => {
-          const expDate = new Date(exp.date);
-          if (dateOption === "daily") {
-            return expDate.toDateString() === today.toDateString();
-          } else if (dateOption === "monthly") {
-            return expDate.getMonth() === today.getMonth() &&
-                   expDate.getFullYear() === today.getFullYear();
-          } else if (dateOption === "yearly") {
-            return expDate.getFullYear() === today.getFullYear();
-          }
-        });
-      }
-
-      renderExpenses(filtered);
+    function showSignupForm() {
+      hideAllSections();
+      document.getElementById('signupForm').classList.remove('hidden');
     }
 
-    dateFilter.addEventListener("change", filterExpenses);
-    categoryFilter.addEventListener("change", filterExpenses);
+    function showLoginForm() {
+      hideAllSections();
+      document.getElementById('loginForm').classList.remove('hidden');
+    }
 
-    addExpenseBtn.addEventListener("click", () => addExpenseModal.classList.remove("hidden"));
-    cancelBtn.addEventListener("click", () => addExpenseModal.classList.add("hidden"));
+    function showDividedExpense() {
+      hideAllSections();
+      document.getElementById('dividedExpensePage').classList.remove('hidden');
+    }
 
-    expenseForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("expenseName").value;
-      const category = document.getElementById("expenseCategory").value;
-      const date = document.getElementById("expenseDate").value;
-      const amount = parseFloat(document.getElementById("expenseAmount").value);
+    function showViewExpenses() {
+      hideAllSections();
+      document.getElementById('viewExpensesPage').classList.remove('hidden');
+    }
 
-      expenses.push({ name, category, date, amount });
-      addExpenseModal.classList.add("hidden");
-      expenseForm.reset();
-      filterExpenses();
-    });
+    function validateSignup() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const terms = document.getElementById('terms').checked;
 
-    deleteExpenseBtn.addEventListener("click", () => {
-      if (expenses.length) {
-        const deleted = expenses.pop();
-        deletedExpenses.push(deleted);
-        filterExpenses();
+      if (password !== confirmPassword) {
+        document.getElementById('signupError').innerText = "Passwords do not match.";
+        return false;
       }
-    });
 
-    undoDeleteBtn.addEventListener("click", () => {
-      if (deletedExpenses.length) {
-        const restored = deletedExpenses.pop();
-        expenses.push(restored);
-        filterExpenses();
+      if (!terms) {
+        document.getElementById('signupError').innerText = "You must accept the terms and conditions.";
+        return false;
       }
-    });
 
-    renderExpenses(expenses);
+      document.getElementById('signupError').innerText = "";
+      alert("Signup successful!");
+      return true;
+    }
+
+    function validateLogin() {
+      const name = document.getElementById('loginName').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (name.trim() === "" || password.trim() === "") {
+        document.getElementById('loginError').innerText = "All fields are required.";
+        return false;
+      }
+
+      document.getElementById('loginError').innerText = "";
+      alert("Login successful!");
+      return true;
+    }
+  // ... your existing JS functions
+
+  function logout() {
+    alert("You have been logged out.");
+    hideAllSections(); // Hides all sections like login/signup forms
+    // You can also clear any session data here if needed
+  }
+
   </script>
+
 </body>
 </html>
