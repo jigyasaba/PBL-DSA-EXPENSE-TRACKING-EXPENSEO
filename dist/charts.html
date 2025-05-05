@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expenseo - Charts Summary</title>
+  <link rel="stylesheet" href="second.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-down {
+      animation: fadeInDown 0.8s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-purple-50 to-white min-h-screen">
+  <!-- Header with Dynamic Greeting -->
+  <header class="sticky top-0 bg-white bg-opacity-90 backdrop-blur-md shadow-md py-6 z-20">
+    <div class="container mx-auto px-4 text-center">
+      <h1 id="greeting" class="fade-in-down text-3xl md:text-4xl font-extrabold text-purple-700 transition duration-500">
+        Your Spending Summary
+      </h1>
+    </div>
+  </header>
+
+  <!-- Controls -->
+  <section class="container mx-auto px-4 mt-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
+      <div class="flex flex-col">
+        <label for="periodSelect" class="mb-2 font-semibold text-gray-700">Select Period</label>
+        <select id="periodSelect" class="p-2 border border-gray-300 rounded focus:ring-2 ring-purple-300">
+          <option value="daily">Daily</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+      <div class="flex flex-col">
+        <label for="categorySelect" class="mb-2 font-semibold text-gray-700">Category</label>
+        <select id="categorySelect" class="p-2 border border-gray-300 rounded focus:ring-2 ring-purple-300">
+          <option value="all">All</option>
+          <option value="food">Food</option>
+          <option value="transport">Transport</option>
+          <option value="utilities">Utilities</option>
+          <option value="entertainment">Entertainment</option>
+        </select>
+      </div>
+      <div class="col-span-1 lg:col-span-2 flex justify-center lg:justify-end space-x-4">
+        <button id="addExpenseBtn" class="px-4 py-2 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition">Add Expense</button>
+        <button id="deleteExpenseBtn" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">Delete Last</button>
+        <button id="undoDeleteBtn" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">Undo Delete</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <section class="container mx-auto px-4 mt-10 space-y-10">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Summary Chart</h2>
+      <div class="w-full h-64 md:h-80">
+        <canvas id="summaryChart"></canvas>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Trend Chart</h2>
+      <div class="w-full h-64 md:h-80">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add Expense Modal -->
+  <div id="addExpenseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 md:w-1/3">
+      <h3 class="text-2xl font-semibold mb-4">Add New Expense</h3>
+      <form id="expenseForm" class="space-y-4">
+        <input type="text" id="expenseName" placeholder="Expense Name" required class="w-full p-2 border rounded" />
+        <select id="expenseCategory" required class="w-full p-2 border rounded">
+          <option value="food">Food</option>
+          <option value="transport">Transport</option>
+          <option value="utilities">Utilities</option>
+          <option value="entertainment">Entertainment</option>
+        </select>
+        <input type="date" id="expenseDate" required class="w-full p-2 border rounded" />
+        <input type="number" id="expenseAmount" placeholder="Amount" required class="w-full p-2 border rounded" />
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Fetch user name dynamically
+    const user = JSON.parse(localStorage.getItem('currentUser')) || { fullname: 'User' };
+    document.getElementById('greeting').textContent = `Your Spending Summary, ${user.fullname}`;
+
+    // Expense data
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    let deletedExpenses = JSON.parse(localStorage.getItem('deletedExpenses')) || [];
+
+    // Elements
+    const periodSelect = document.getElementById('periodSelect');
+    const categorySelect = document.getElementById('categorySelect');
+    const ctxSummary = document.getElementById('summaryChart').getContext('2d');
+    const ctxTrend = document.getElementById('trendChart').getContext('2d');
+    let summaryChart, trendChart;
+
+    function aggregate(period, category) {
+      const today = new Date();
+      const map = {};
+      expenses.forEach(e => {
+        if (category !== 'all' && e.category !== category) return;
+        const d = new Date(e.date);
+        // For monthly only show current year
+        if (period === 'monthly' && d.getFullYear() !== today.getFullYear()) return;
+        let key;
+        if (period === 'daily') key = d.toDateString();
+        else if (period === 'monthly') key = `${d.toLocaleString('default',{month:'short'})} ${d.getFullYear()}`;
+        else if (period === 'yearly') key = `${d.getFullYear()}`;
+        map[key] = (map[key] || 0) + e.amount;
+      });
+      return Object.entries(map).sort((a,b) => new Date(a[0]) - new Date(b[0]));(map).sort((a,b) => new Date(a[0]) - new Date(b[0]));
+    }
+
+    function renderCharts() {
+      const period = periodSelect.value;
+      const category = categorySelect.value;
+      const data = aggregate(period, category);
+      const labels = data.map(d => d[0]);
+      const values = data.map(d => d[1]);
+
+      if (summaryChart) summaryChart.destroy();
+      summaryChart = new Chart(ctxSummary, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data: values, backgroundColor: ['#8B78E6','#F59E0B','#EF4444','#10B981'] }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: `${period.charAt(0).toUpperCase()+period.slice(1)} Summary` } } }
+      });
+
+      if (trendChart) trendChart.destroy();
+      trendChart = new Chart(ctxTrend, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Amount', data: values, borderColor: '#8B78E6', tension: 0.3, fill: true, backgroundColor: 'rgba(139,120,230,0.2)' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: `${period.charAt(0).toUpperCase()+period.slice(1)} Trend` } } }
+      });
+    }
+
+    // Controls
+    periodSelect.addEventListener('change', renderCharts);
+    categorySelect.addEventListener('change', renderCharts);
+    document.getElementById('addExpenseBtn').addEventListener('click', () => document.getElementById('addExpenseModal').classList.remove('hidden'));
+    document.getElementById('cancelBtn').addEventListener('click', () => document.getElementById('addExpenseModal').classList.add('hidden'));
+
+    // Expense form logic
+    document.getElementById('expenseForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('expenseName').value;
+      const category = document.getElementById('expenseCategory').value;
+      const date = document.getElementById('expenseDate').value;
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
+      expenses.push({ name, category, date, amount });
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+      document.getElementById('expenseForm').reset();
+      document.getElementById('addExpenseModal').classList.add('hidden');
+      renderCharts();
+    });
+
+    // Delete / Undo logic
+    document.getElementById('deleteExpenseBtn').addEventListener('click', () => {
+      if (expenses.length) { deletedExpenses.push(expenses.pop()); localStorage.setItem('deletedExpenses', JSON.stringify(deletedExpenses)); localStorage.setItem('expenses', JSON.stringify(expenses)); renderCharts(); }
+    });
+    document.getElementById('undoDeleteBtn').addEventListener('click', () => {
+      if (deletedExpenses.length) { expenses.push(deletedExpenses.pop()); localStorage.setItem('expenses', JSON.stringify(expenses)); localStorage.setItem('deletedExpenses', JSON.stringify(deletedExpenses)); renderCharts(); }
+    });
+
+    // Initial
+    renderCharts();
+  </script>
+</body>
+</html>

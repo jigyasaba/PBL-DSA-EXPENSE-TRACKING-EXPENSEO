@@ -7,25 +7,21 @@
   <link rel="stylesheet" href="second.css">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <style>
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    .animate-pulse-custom {
-      animation: pulse 2s infinite;
-    }
+    @keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.05);} }
+    .animate-pulse-custom { animation: pulse 2s infinite; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
+  <!-- Background Piggy Bank -->
   <div>
     <img src="./resources/piggy-bank.gif" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-auto opacity-80 z-0" />
   </div>
+
   <div class="container mx-auto p-4">
     <!-- Animated Card -->
     <div class="flex justify-end mb-4">
-      <a href="dummy.html" class="relative bg-[#8B78E6] text-white px-6 py-4 rounded-lg shadow-lg animate-pulse-custom hover:shadow-xl transition duration-300">
+      <a href="charts.html" class="relative bg-[#8B78E6] text-white px-6 py-4 rounded-lg shadow-lg animate-pulse-custom hover:shadow-xl transition duration-300">
         Know where you are spending
         <span class="absolute top-0 right-0 mt-2 mr-2 text-sm">→</span>
       </a>
@@ -119,32 +115,34 @@
   </div>
 
   <script>
-    let expenses = [
-      { name: "Groceries", category: "food", date: "2025-04-30", amount: 1500 },
-      { name: "Bus Ticket", category: "transport", date: "2025-04-29", amount: 50 },
-      { name: "Electricity Bill", category: "utilities", date: "2025-04-28", amount: 1200 },
-      { name: "Movie", category: "entertainment", date: "2025-04-27", amount: 300 }
-    ];
+    // Load from localStorage
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    let deletedExpenses = JSON.parse(localStorage.getItem('deletedExpenses')) || [];
 
-    let deletedExpenses = [];
+    const expenseTableBody = document.getElementById('expenseTableBody');
+    const dateFilter = document.getElementById('dateFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const addExpenseBtn = document.getElementById('addExpenseBtn');
+    const deleteExpenseBtn = document.getElementById('deleteExpenseBtn');
+    const undoDeleteBtn = document.getElementById('undoDeleteBtn');
+    const addExpenseModal = document.getElementById('addExpenseModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const expenseForm = document.getElementById('expenseForm');
 
-    const expenseTableBody = document.getElementById("expenseTableBody");
-    const dateFilter = document.getElementById("dateFilter");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const addExpenseBtn = document.getElementById("addExpenseBtn");
-    const deleteExpenseBtn = document.getElementById("deleteExpenseBtn");
-    const undoDeleteBtn = document.getElementById("undoDeleteBtn");
-    const addExpenseModal = document.getElementById("addExpenseModal");
-    const cancelBtn = document.getElementById("cancelBtn");
-    const expenseForm = document.getElementById("expenseForm");
+    // Persist state
+    function saveState() {
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+      localStorage.setItem('deletedExpenses', JSON.stringify(deletedExpenses));
+    }
 
+    // Render rows
     function renderExpenses(data) {
-      expenseTableBody.innerHTML = "";
-      data.forEach((exp, index) => {
-        const row = document.createElement("tr");
-        row.className = "hover:bg-gray-100 transition duration-200";
+      expenseTableBody.innerHTML = '';
+      data.forEach((exp, idx) => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-100 transition duration-200';
         row.innerHTML = `
-          <td class="py-2 px-4 border-b">${index + 1}</td>
+          <td class="py-2 px-4 border-b">${idx + 1}</td>
           <td class="py-2 px-4 border-b">${exp.name}</td>
           <td class="py-2 px-4 border-b">${exp.category}</td>
           <td class="py-2 px-4 border-b">${exp.date}</td>
@@ -154,69 +152,76 @@
       });
     }
 
+    // Filtering logic
     function filterExpenses() {
       let filtered = [...expenses];
-      const category = categoryFilter.value;
-      const dateOption = dateFilter.value;
+      const cat = categoryFilter.value;
+      const dateOpt = dateFilter.value;
       const today = new Date();
-
-      if (category !== "all") {
-        filtered = filtered.filter(exp => exp.category === category);
+      // Category filter
+      if (cat !== 'all') {
+        filtered = filtered.filter(e => e.category === cat);
       }
-
-      if (dateOption !== "all") {
-        filtered = filtered.filter(exp => {
-          const expDate = new Date(exp.date);
-          if (dateOption === "daily") {
-            return expDate.toDateString() === today.toDateString();
-          } else if (dateOption === "monthly") {
-            return expDate.getMonth() === today.getMonth() &&
-                   expDate.getFullYear() === today.getFullYear();
-          } else if (dateOption === "yearly") {
-            return expDate.getFullYear() === today.getFullYear();
+      // Date filter
+      if (dateOpt !== 'all') {
+        filtered = filtered.filter(e => {
+          const d = new Date(e.date);
+          if (dateOpt === 'daily') {
+            return d.toDateString() === today.toDateString();
+          }
+          if (dateOpt === 'monthly') {
+            return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+          }
+          if (dateOpt === 'yearly') {
+            return d.getFullYear() === today.getFullYear();
           }
         });
       }
-
+      // Sorting logic
+      if (dateOpt === 'yearly') {
+        // sort by year descending
+        filtered.sort((a, b) => new Date(b.date).getFullYear() - new Date(a.date).getFullYear());
+      } else {
+        // sort by full date descending (latest first)
+        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
       renderExpenses(filtered);
     }
 
-    dateFilter.addEventListener("change", filterExpenses);
-    categoryFilter.addEventListener("change", filterExpenses);
-
-    addExpenseBtn.addEventListener("click", () => addExpenseModal.classList.remove("hidden"));
-    cancelBtn.addEventListener("click", () => addExpenseModal.classList.add("hidden"));
-
-    expenseForm.addEventListener("submit", e => {
+    // Event listeners
+    dateFilter.addEventListener('change', filterExpenses);
+    categoryFilter.addEventListener('change', filterExpenses);
+    addExpenseBtn.addEventListener('click', () => addExpenseModal.classList.remove('hidden'));
+    cancelBtn.addEventListener('click', () => addExpenseModal.classList.add('hidden'));
+    expenseForm.addEventListener('submit', e => {
       e.preventDefault();
-      const name = document.getElementById("expenseName").value;
-      const category = document.getElementById("expenseCategory").value;
-      const date = document.getElementById("expenseDate").value;
-      const amount = parseFloat(document.getElementById("expenseAmount").value);
-
+      const name = document.getElementById('expenseName').value;
+      const category = document.getElementById('expenseCategory').value;
+      const date = document.getElementById('expenseDate').value;
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
       expenses.push({ name, category, date, amount });
-      addExpenseModal.classList.add("hidden");
+      saveState();
       expenseForm.reset();
+      addExpenseModal.classList.add('hidden');
       filterExpenses();
     });
-
-    deleteExpenseBtn.addEventListener("click", () => {
+    deleteExpenseBtn.addEventListener('click', () => {
       if (expenses.length) {
-        const deleted = expenses.pop();
-        deletedExpenses.push(deleted);
+        deletedExpenses.push(expenses.pop());
+        saveState();
         filterExpenses();
       }
     });
-
-    undoDeleteBtn.addEventListener("click", () => {
+    undoDeleteBtn.addEventListener('click', () => {
       if (deletedExpenses.length) {
-        const restored = deletedExpenses.pop();
-        expenses.push(restored);
+        expenses.push(deletedExpenses.pop());
+        saveState();
         filterExpenses();
       }
     });
 
-    renderExpenses(expenses);
+    // Initial render
+    filterExpenses();
   </script>
 </body>
 </html>

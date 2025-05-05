@@ -6,376 +6,186 @@
   <title>Expenseo - The Budget Buddy</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&display=swap');
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f3f4f6;
-      display: flex;
-      height: 100vh;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Full-screen Background Video */
-    .background-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
-
-    header {
-      width: 100%;
-      text-align: center;
-      padding: 20px 0;
-      background-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1;
-    }
-
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.5rem;
-      font-weight: bold;
-      font-style: italic;
-      color: #2c3e50;
-    }
-
-    .sidebar {
-      width: 220px;
-      height: 100vh;
-      background-color: #1e293b;
-      padding-top: 100px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-
-    .sidebar button {
-      display: block;
-      width: 100%;
-      padding: 15px 20px;
-      border: none;
-      background-color: transparent;
-      color: #e2e8f0;
-      font-size: 1rem;
-      text-align: left;
-      cursor: pointer;
-      transition: background-color 0.3s, padding-left 0.3s;
-    }
-
-    .sidebar button:hover {
-      background-color: #334155;
-      padding-left: 30px;
-    }
-
-    .main-content {
-      margin-left: 220px;
-      padding: 120px 20px 20px;
-      z-index: 1;
-    }
-
-    form, .page-section {
-      background: rgba(255, 255, 255, 0.8);
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      max-width: 500px;
-      font-size: 1.1rem;
-      animation: zoomIn 0.3s ease;
-    }
-
-    @keyframes zoomIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    form input,
-    form label {
-      display: block;
-      width: 100%;
-      margin-bottom: 18px;
-      font-size: 1.1rem;
-    }
-
-    form input[type="text"],
-    form input[type="email"],
-    form input[type="password"],
-    form input[type="tel"] {
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    form button {
-      padding: 12px 20px;
-      background-color: #1e40af;
-      color: #fff;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    form button:hover {
-      background-color: #1e3a8a;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .error {
-      color: red;
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-    .background-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  min-width: 100%;
-  min-height: 100%;
-  object-fit: cover;
-  z-index: -1;
-  opacity: 0.8; /* optional: adjust for visibility */
-}
-
-.top-right-logo {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.icon-btn img {
-  width: 50px;
-  height: 50px;
-  transition: transform 0.5s ease;
-}
-
-.icon-btn:hover img {
-  transform: scale(1.3);
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  top: 60px;
-  right: 0;
-  background-color: #fff;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-  z-index: 2;
-  border-radius: 8px;
-}
-
-.dropdown-content a {
-  color: #333;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  font-size: 14px;
-}
-
-.dropdown-content a:hover {
-  background-color: #f1f1f1;
-}
-
-.show {
-  display: block;
-}
-.sidebar button:nth-child(4) {
-  background-color: #b91c1c; /* red */
-  color: white;
-}
-
-.sidebar button:nth-child(4):hover {
-  background-color: #991b1b;
-  padding-left: 30px;
-}
-
-
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Arial', sans-serif; background-color: #f3f4f6; display: flex; height: 100vh; position: relative; overflow: hidden; }
+    .background-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0.8; }
+    header { width: 100%; text-align: center; padding: 20px 0; background: rgba(255,255,255,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; z-index: 1; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; color: #2c3e50; }
+    #welcomeMessage { font-size: 1.2rem; color: #555; margin-top: 5px; }
+    .sidebar { width: 220px; background: #1e293b; padding-top: 100px; position: fixed; top: 0; left: 0; height: 100vh; }
+    .sidebar button { width: 100%; padding: 15px 20px; border: none; background: transparent; color: #e2e8f0; text-align: left; cursor: pointer; transition: 0.3s; }
+    .sidebar button:hover { background: #334155; padding-left: 30px; }
+    .main-content { margin-left: 220px; padding: 140px 20px 20px; width: calc(100% - 220px); }
+    form, .page-section { background: rgba(255,255,255,0.8); padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); max-width: 500px; animation: zoomIn 0.3s ease; }
+    @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    form input, form label { display: block; width: 100%; margin-bottom: 18px; font-size: 1.1rem; }
+    form input[type="text"], form input[type="email"], form input[type="password"], form input[type="tel"] { padding: 12px; border: 1px solid #ccc; border-radius: 6px; }
+    form button { padding: 12px 20px; background: #1e40af; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; }
+    form button:hover { background: #1e3a8a; }
+    .hidden { display: none; }
+    .error { color: red; font-size: 1rem; margin-bottom: 10px; }
+    .dropdown { position: absolute; top: 10px; right: 20px; }
+    .icon-btn { background: none; border: none; cursor: pointer; padding: 0; }
+    .icon-btn img { width: 50px; height: 50px; transition: transform 0.5s; }
+    .icon-btn:hover img { transform: scale(1.3); }
+    .dropdown-content { display: none; position: absolute; top: 60px; right: 0; background: #fff; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 8px; z-index: 2; }
+    .dropdown-content a { display: block; padding: 12px 16px; text-decoration: none; color: #333; font-size: 0.9rem; }
+    .dropdown-content a:hover { background: #f1f1f1; }
+    .show { display: block; }
   </style>
 </head>
 <body>
-
-<video class="background-video" autoplay muted loop>
-  <source src="resources/video.mp4" type="video/mp4">
-  video cant run 
-</video>
+  <video class="background-video" autoplay muted loop>
+    <source src="resources/video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 
   <header>
     <h1>Expenseo - The Budget Buddy</h1>
-    <div class="dropdown top-right-logo">
-      <button onclick="toggleDropdown()" class="icon-btn">
-        <img src="resources/k.jpg" alt="Logo">
-      </button>
+    <div id="welcomeMessage">Welcome, User</div>
+    <div class="dropdown">
+      <button class="icon-btn" onclick="toggleDropdown()"><img src="resources/k.jpg" alt="Logo"></button>
       <div id="myDropdown" class="dropdown-content">
-        <a href="https://example.com/insights">Get Insights About Your Expenses</a>
-        <a href="https://example.com/view">View</a>
-        <a href="https://example.com/delete">Delete</a>
+        <a href="#" onclick="showInsights()">Get Insights</a>
+        <a href="#" onclick="redirectViewExpenses()">View Expenses</a>
+        <a href="#" onclick="clearExpenses()">Delete Expenses</a>
       </div>
     </div>
-    
   </header>
 
   <nav class="sidebar">
-    <button onclick="showDividedExpense()">Divided Expense</button>
-    <button onclick="showViewExpenses()">View Expenses</button>
+    <button><a href="divide.html">Divide Your Expenses</a></button>
+    <button onclick="redirectViewExpenses()">View Expenses</button>
     <button onclick="showLoginForm()">Login</button>
     <button onclick="showSignupForm()">Signup</button>
     <button onclick="logout()">Logout</button>
-  
   </nav>
 
   <div class="main-content">
-
-    <!-- Signup Form -->
     <form id="signupForm" class="hidden" onsubmit="return validateSignup()">
-      <h2 style="font-size: 1.8rem; margin-bottom: 20px;">Signup</h2>
+      <h2>Signup</h2>
       <input type="text" id="fullname" placeholder="Full Name" required />
       <input type="email" id="email" placeholder="Email" required />
       <input type="password" id="password" placeholder="Password" required />
       <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
       <input type="tel" id="phone" placeholder="Phone Number" required />
-      <label>
-        <input type="checkbox" id="terms" required />
-        I accept the terms and conditions
-      </label>
+      <label><input type="checkbox" id="terms" required /> I accept the terms</label>
       <div class="error" id="signupError"></div>
       <button type="submit">Submit</button>
     </form>
 
-    <!-- Login Form -->
     <form id="loginForm" class="hidden" onsubmit="return validateLogin()">
-      <h2 style="font-size: 1.8rem; margin-bottom: 20px;">Login</h2>
-      <input type="text" id="loginName" placeholder="Name" required />
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email" required />
       <input type="password" id="loginPassword" placeholder="Password" required />
       <div class="error" id="loginError"></div>
       <button type="submit">Login</button>
     </form>
 
-    <!-- Divided Expense Page -->
     <div id="dividedExpensePage" class="page-section hidden">
-      <h2 style="font-size: 1.8rem;">Divided Expense Page</h2>
-      <p>This is where you can divide your expenses with others.</p>
+      <h2>Divided Expense Page</h2>
+      <p>Divide your expenses with others.</p>
     </div>
-
-    <!-- View Expenses Page -->
-    <div id="viewExpensesPage" class="page-section hidden">
-      <h2 style="font-size: 1.8rem;">View Expenses</h2>
-      <p>This is where your tracked expenses will be shown.</p>
-    </div>
-
   </div>
 
   <script>
     function toggleDropdown() {
-  document.getElementById("myDropdown").classList.toggle("show");
-}
-
-window.addEventListener('click', function(event) {
-  if (!event.target.closest('.dropdown')) {
-    document.getElementById("myDropdown").classList.remove("show");
-  }
-});
+      document.getElementById('myDropdown').classList.toggle('show');
+    }
+    window.addEventListener('click', e => {
+      if (!e.target.closest('.dropdown')) {
+        document.getElementById('myDropdown').classList.remove('show');
+      }
+    });
 
     function hideAllSections() {
-      document.getElementById('signupForm').classList.add('hidden');
-      document.getElementById('loginForm').classList.add('hidden');
-      document.getElementById('dividedExpensePage').classList.add('hidden');
-      document.getElementById('viewExpensesPage').classList.add('hidden');
+      ['signupForm','loginForm','dividedExpensePage'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    }
+    function showSignupForm() { hideAllSections(); document.getElementById('signupForm').classList.remove('hidden'); }
+    function showLoginForm() { hideAllSections(); document.getElementById('loginForm').classList.remove('hidden'); }
+    function showDividedExpense() { hideAllSections(); document.getElementById('dividedExpensePage').classList.remove('hidden'); }
+    function showInsights() { alert('Insights coming soon!'); }
+
+    function redirectViewExpenses() {
+      if (localStorage.getItem('session')) {
+        window.location.href = 'expensespage.html';
+      } else {
+        alert('Please login to view your expenses.');
+        showLoginForm();
+      }
     }
 
-    function showSignupForm() {
-      hideAllSections();
-      document.getElementById('signupForm').classList.remove('hidden');
-    }
-
-    function showLoginForm() {
-      hideAllSections();
-      document.getElementById('loginForm').classList.remove('hidden');
-    }
-
-    function showDividedExpense() {
-      hideAllSections();
-      document.getElementById('dividedExpensePage').classList.remove('hidden');
-    }
-
-    function showViewExpenses() {
-      hideAllSections();
-      document.getElementById('viewExpensesPage').classList.remove('hidden');
+    function updateWelcome() {
+      const msg = document.getElementById('welcomeMessage');
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      msg.textContent = user ? `Welcome, ${user.fullname}` : 'Welcome, User';
     }
 
     function validateSignup() {
+      const fullname = document.getElementById('fullname').value;
+      const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
       const terms = document.getElementById('terms').checked;
-
-      if (password !== confirmPassword) {
-        document.getElementById('signupError').innerText = "Passwords do not match.";
+      if (password !== confirm) {
+        document.getElementById('signupError').innerText = 'Passwords do not match.';
         return false;
       }
-
       if (!terms) {
-        document.getElementById('signupError').innerText = "You must accept the terms and conditions.";
+        document.getElementById('signupError').innerText = 'You must accept the terms and conditions.';
         return false;
       }
-
-      document.getElementById('signupError').innerText = "";
-      alert("Signup successful!");
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      if (users.find(u => u.email === email)) {
+        document.getElementById('signupError').innerText = 'User already exists.';
+        return false;
+      }
+      users.push({ fullname, email, password });
+      localStorage.setItem('users', JSON.stringify(users));
+      alert('Signup successful!');
       return true;
     }
 
     function validateLogin() {
-      const name = document.getElementById('loginName').value;
+      const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
-
-      if (name.trim() === "" || password.trim() === "") {
-        document.getElementById('loginError').innerText = "All fields are required.";
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) {
+        document.getElementById('loginError').innerText = 'Invalid credentials.';
         return false;
       }
-
-      document.getElementById('loginError').innerText = "";
-      alert("Login successful!");
-      return true;
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem('session', 'active');
+      alert('Login successful!');
+      updateWelcome();
+      redirectViewExpenses();
+      return false;
     }
-  // ... your existing JS functions
 
-  function logout() {
-    alert("You have been logged out.");
-    hideAllSections(); // Hides all sections like login/signup forms
-    // You can also clear any session data here if needed
-  }
+    function logout() {
+      localStorage.removeItem('session');
+      localStorage.removeItem('currentUser');
+      alert('Logged out.');
+      updateWelcome();
+      hideAllSections();
+      showLoginForm();
+    }
 
+    function clearExpenses() {
+      if (confirm('Delete all expenses?')) {
+        localStorage.removeItem('expenses');
+        alert('All expenses deleted.');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateWelcome();
+      if (!localStorage.getItem('session')) {
+        showLoginForm();
+      }
+    });
   </script>
-
 </body>
 </html>
+

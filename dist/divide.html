@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Expense Divider</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-b from-green-100 to-white min-h-screen py-10 px-6">
+  <h1 class="text-3xl font-bold text-center text-green-700 mb-8">
+    Split Expenses Among Friends
+  </h1>
+
+  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-4">
+    <div>
+      <label for="numPeople" class="font-semibold">Number of People:</label>
+      <input type="number" id="numPeople" min="2" value="2"
+             class="border-gray-300 rounded p-2 w-full mt-1 border" />
+    </div>
+
+    <div id="inputsContainer" class="space-y-3"></div>
+
+    <div>
+      <button id="createBtn" type="button"
+              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        Create Inputs
+      </button>
+      <button id="divideBtn" type="button" disabled
+              class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ml-2 disabled:opacity-50">
+        Divide
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-3xl mx-auto mt-10 p-6 bg-white shadow rounded">
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">
+      Settlement Summary
+    </h2>
+    <div id="result" class="space-y-2 text-gray-800"></div>
+  </div>
+
+  <script>
+    const numInput        = document.getElementById('numPeople');
+    const inputsContainer = document.getElementById('inputsContainer');
+    const createBtn       = document.getElementById('createBtn');
+    const divideBtn       = document.getElementById('divideBtn');
+    const resultDiv       = document.getElementById('result');
+    const EPSILON         = 0.01;
+
+    createBtn.addEventListener('click', generateInputs);
+    divideBtn.addEventListener('click', calculateSettlement);
+    window.addEventListener('DOMContentLoaded', generateInputs);
+
+    function generateInputs() {
+      const n = parseInt(numInput.value, 10);
+      if (isNaN(n) || n < 2) {
+        alert('Please enter at least 2 people.');
+        return;
+      }
+      inputsContainer.innerHTML = '';
+      resultDiv.innerHTML = '';
+      divideBtn.disabled = false;
+
+      for (let i = 0; i < n; i++) {
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-2 gap-4';
+
+        const nameInput = document.createElement('input');
+        nameInput.type        = 'text';
+        nameInput.placeholder = `Name of Person ${i + 1}`;
+        nameInput.className   = 'name border p-2 rounded';
+        nameInput.required    = true;
+
+        const amtInput = document.createElement('input');
+        amtInput.type        = 'number';
+        amtInput.placeholder = 'Amount Paid';
+        amtInput.className   = 'amount border p-2 rounded';
+        amtInput.min         = '0';
+        amtInput.required    = true;
+
+        row.append(nameInput, amtInput);
+        inputsContainer.appendChild(row);
+      }
+    }
+
+    function calculateSettlement() {
+      const namesEls = Array.from(inputsContainer.querySelectorAll('.name'));
+      const amtEls   = Array.from(inputsContainer.querySelectorAll('.amount'));
+      if (!namesEls.length) {
+        alert('Please click “Create Inputs” first.');
+        return;
+      }
+
+      // Validate
+      for (let i = 0; i < namesEls.length; i++) {
+        if (!namesEls[i].value.trim()) {
+          alert(`Enter a name for person ${i + 1}.`);
+          return;
+        }
+        if (amtEls[i].value === '' || parseFloat(amtEls[i].value) < 0) {
+          alert(`Enter a non-negative amount for ${namesEls[i].value}.`);
+          return;
+        }
+      }
+
+      const names   = namesEls.map(el => el.value.trim());
+      const amounts = amtEls.map(el => parseFloat(el.value));
+      const n       = names.length;
+      const total   = amounts.reduce((a, b) => a + b, 0);
+      const share   = total / n;
+
+      // Build net balances
+      const net = names.map((name, i) => ({
+        name,
+        balance: parseFloat((amounts[i] - share).toFixed(2)),
+      }));
+
+      function getMaxCredit() {
+        return net.reduce(
+          (best, p, i) => p.balance > net[best].balance ? i : best,
+          0
+        );
+      }
+      function getMaxDebit() {
+        return net.reduce(
+          (worst, p, i) => p.balance < net[worst].balance ? i : worst,
+          0
+        );
+      }
+
+      const transactions = [];
+      const MAX_ITERS = net.length * net.length * 10;
+      let iters = 0;
+
+      while (true) {
+        const c   = getMaxCredit();
+        const d   = getMaxDebit();
+        const amt = Math.min(net[c].balance, -net[d].balance);
+
+        if (amt <= EPSILON) break;
+
+        if (++iters > MAX_ITERS) {
+          console.warn('Reached max settlement iterations.');
+          break;
+        }
+
+        net[c].balance -= amt;
+        net[d].balance += amt;
+        net[c].balance = parseFloat(net[c].balance.toFixed(2));
+        net[d].balance = parseFloat(net[d].balance.toFixed(2));
+
+        transactions.push(
+          `${net[d].name} pays ₹${amt.toFixed(2)} to ${net[c].name}`
+        );
+      }
+
+      resultDiv.innerHTML = `
+        <p><strong>Total Spent:</strong> ₹${total.toFixed(2)}</p>
+        <p><strong>Each Person Owes:</strong> ₹${share.toFixed(2)}</p>
+        <h3 class="mt-4 font-semibold">Transactions:</h3>
+        ${transactions.map(t => `<p>• ${t}</p>`).join('')}
+      `;
+    }
+  </script>
+</body>
+</html>
