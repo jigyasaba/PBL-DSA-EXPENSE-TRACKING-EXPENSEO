@@ -8,43 +8,248 @@
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Arial', sans-serif; background-color: #f3f4f6; display: flex; height: 100vh; position: relative; overflow: hidden; }
-    .background-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0.8; }
+    .background-video { 
+      position: fixed; 
+      top: 50%;
+      left: 50%;
+      min-width: 100%; 
+      min-height: 100%; 
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: contain; 
+      z-index: -1; 
+      opacity: 0.8; 
+        }
     header { width: 100%; text-align: center; padding: 20px 0; background: rgba(255,255,255,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; z-index: 1; }
     h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; color: #2c3e50; }
     #welcomeMessage { font-size: 1.2rem; color: #555; margin-top: 5px; }
-    .sidebar { width: 220px; background: #1e293b; padding-top: 100px; position: fixed; top: 0; left: 0; height: 100vh; }
-    .sidebar button { width: 100%; padding: 15px 20px; border: none; background: transparent; color: #e2e8f0; text-align: left; cursor: pointer; transition: 0.3s; }
-    .sidebar button:hover { background: #334155; padding-left: 30px; }
-    .main-content { margin-left: 220px; padding: 140px 20px 20px; width: calc(100% - 220px); }
-    form, .page-section { background: rgba(255,255,255,0.8); padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); max-width: 500px; animation: zoomIn 0.3s ease; }
-    @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    form input, form label { display: block; width: 100%; margin-bottom: 18px; font-size: 1.1rem; }
-    form input[type="text"], form input[type="email"], form input[type="password"], form input[type="tel"] { padding: 12px; border: 1px solid #ccc; border-radius: 6px; }
-    form button { padding: 12px 20px; background: #1e40af; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; }
-    form button:hover { background: #1e3a8a; }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100vh;
+      background-color: rgba(117, 136, 140, 0.514);
+      padding-top: 120px;
+      padding-left: 10px;
+      padding-right: 10px;
+      overflow-y: auto;
+      z-index: 10;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 16px 20px;
+      margin-bottom: 10px;
+      border: none;
+      background: #4c4f54;
+      color: #e2e8f0;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      display: block;
+    }
+
+    .sidebar button:hover {
+      background: #079ecc82;
+      transform: translateX(5px);
+    }
+
+    .sidebar button a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 140px 20px 20px;
+      width: calc(100% - 220px);
+      min-height: calc(100vh - 60px);
+    }
+
+    form, .page-section {
+      background: rgba(255,255,255,0.8);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      max-width: 500px;
+      margin: 0 auto;
+      animation: zoomIn 0.3s ease;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    form input, form label {
+      display: block;
+      width: 100%;
+      margin-bottom: 18px;
+      font-size: 1.1rem;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="tel"] {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    form button {
+      padding: 12px 20px;
+      background: #1e40af;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      width: 100%;
+    }
+
+    form button:hover {
+      background: #1e3a8a;
+    }
+
     .hidden { display: none; }
     .error { color: red; font-size: 1rem; margin-bottom: 10px; }
-    .dropdown { position: absolute; top: 10px; right: 20px; }
-    .icon-btn { background: none; border: none; cursor: pointer; padding: 0; }
-    .icon-btn img { width: 50px; height: 50px; transition: transform 0.5s; }
-    .icon-btn:hover img { transform: scale(1.3); }
-    .dropdown-content { display: none; position: absolute; top: 60px; right: 0; background: #fff; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 8px; z-index: 2; }
-    .dropdown-content a { display: block; padding: 12px 16px; text-decoration: none; color: #333; font-size: 0.9rem; }
-    .dropdown-content a:hover { background: #f1f1f1; }
+
+    .dropdown {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .icon-btn img {
+      width: 50px;
+      height: 50px;
+      transition: transform 0.5s;
+      border-radius: 50%;
+    }
+
+    .icon-btn:hover img {
+      transform: scale(1.1);
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: #fff;
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      z-index: 2;
+    }
+
+    .dropdown-content a {
+      display: block;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: #333;
+      font-size: 0.9rem;
+    }
+
+    .dropdown-content a:hover {
+      background: #f1f1f1;
+    }
+
     .show { display: block; }
+
+    .menu-btn {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      font-size: 18px;
+      background-color: #1e293b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 100;
+    }
+
+    .menu-btn:hover {
+      background-color: #334155;
+    }
+
+    @media (max-width: 768px) {
+      .menu-btn {
+        display: block;
+      }
+    }
+
+    .footer {
+      background-color: #f1f1f1;
+      color: #555;
+      font-size: 14px;
+      text-align: center;
+      padding: 15px 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      border-top: 1px solid #ddd;
+      z-index: 5;
+    }
+
+    .footer a {
+      color: #007BFF;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <video class="background-video" autoplay muted loop>
-    <source src="resources/video.mp4" type="video/mp4">
+    <source src="resources/video2.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
+  <button class="menu-btn" id="mobileMenuButton">☰ Menu</button>
+
   <header>
     <h1>Expenseo - The Budget Buddy</h1>
-    <div id="welcomeMessage">Welcome, User</div>
+    <div id="welcomeMessage">Welcome, Guest</div>
     <div class="dropdown">
-      <button class="icon-btn" onclick="toggleDropdown()"><img src="resources/k.jpg" alt="Logo"></button>
+      <button class="icon-btn" onclick="toggleDropdown()"><img src="resources/k.jpg" alt="User Menu"></button>
       <div id="myDropdown" class="dropdown-content">
         <a href="#" onclick="showInsights()">Get Insights</a>
         <a href="#" onclick="redirectViewExpenses()">View Expenses</a>
@@ -53,8 +258,8 @@
     </div>
   </header>
 
-  <nav class="sidebar">
-    <button><a href="divide.html">Divide Your Expenses</a></button>
+  <nav class="sidebar" id="mainSidebar">
+    <button onclick="window.location.href='divide.html'">Divide Your Expenses</button>
     <button onclick="redirectViewExpenses()">View Expenses</button>
     <button onclick="showLoginForm()">Login</button>
     <button onclick="showSignupForm()">Signup</button>
@@ -64,10 +269,15 @@
   <div class="main-content">
     <form id="signupForm" class="hidden" onsubmit="return validateSignup()">
       <h2>Signup</h2>
+      <label for="fullname">Full Name</label>
       <input type="text" id="fullname" placeholder="Full Name" required />
+      <label for="email">Email</label>
       <input type="email" id="email" placeholder="Email" required />
+      <label for="password">Password</label>
       <input type="password" id="password" placeholder="Password" required />
+      <label for="confirmPassword">Confirm Password</label>
       <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+      <label for="phone">Phone Number</label>
       <input type="tel" id="phone" placeholder="Phone Number" required />
       <label><input type="checkbox" id="terms" required /> I accept the terms</label>
       <div class="error" id="signupError"></div>
@@ -76,7 +286,9 @@
 
     <form id="loginForm" class="hidden" onsubmit="return validateLogin()">
       <h2>Login</h2>
+      <label for="loginEmail">Email</label>
       <input type="email" id="loginEmail" placeholder="Email" required />
+      <label for="loginPassword">Password</label>
       <input type="password" id="loginPassword" placeholder="Password" required />
       <div class="error" id="loginError"></div>
       <button type="submit">Login</button>
@@ -88,23 +300,59 @@
     </div>
   </div>
 
+  <footer class="footer">
+    © 2025 Expenseo | <a href="p.html">Privacy Policy</a> | <a href="h.html">Help Center</a> | <a href="c.html">Contact Us</a>
+  </footer>
+
   <script>
+    document.getElementById('mobileMenuButton').addEventListener('click', () => {
+      document.getElementById('mainSidebar').classList.toggle('active');
+    });
+
     function toggleDropdown() {
       document.getElementById('myDropdown').classList.toggle('show');
     }
-    window.addEventListener('click', e => {
+
+    window.addEventListener('click', function(e) {
       if (!e.target.closest('.dropdown')) {
         document.getElementById('myDropdown').classList.remove('show');
       }
     });
 
     function hideAllSections() {
-      ['signupForm','loginForm','dividedExpensePage'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['signupForm', 'loginForm', 'dividedExpensePage'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
     }
-    function showSignupForm() { hideAllSections(); document.getElementById('signupForm').classList.remove('hidden'); }
-    function showLoginForm() { hideAllSections(); document.getElementById('loginForm').classList.remove('hidden'); }
-    function showDividedExpense() { hideAllSections(); document.getElementById('dividedExpensePage').classList.remove('hidden'); }
-    function showInsights() { alert('Insights coming soon!'); }
+
+    function showSignupForm() {
+      hideAllSections();
+      document.getElementById('signupForm').classList.remove('hidden');
+      closeMobileMenu();
+    }
+
+    function showLoginForm() {
+      hideAllSections();
+      document.getElementById('loginForm').classList.remove('hidden');
+      closeMobileMenu();
+    }
+
+    function showDividedExpense() {
+      hideAllSections();
+      document.getElementById('dividedExpensePage').classList.remove('hidden');
+      closeMobileMenu();
+    }
+
+    function showInsights() {
+      alert('Insights coming soon!');
+      closeMobileMenu();
+    }
+
+    function closeMobileMenu() {
+      if (window.innerWidth <= 768) {
+        document.getElementById('mainSidebar').classList.remove('active');
+      }
+    }
 
     function redirectViewExpenses() {
       if (localStorage.getItem('session')) {
@@ -113,50 +361,64 @@
         alert('Please login to view your expenses.');
         showLoginForm();
       }
+      closeMobileMenu();
     }
 
     function updateWelcome() {
       const msg = document.getElementById('welcomeMessage');
       const user = JSON.parse(localStorage.getItem('currentUser'));
-      msg.textContent = user ? `Welcome, ${user.fullname}` : 'Welcome, User';
+      msg.textContent = user ? `Welcome, ${user.fullname}` : 'Welcome, Guest';
     }
 
     function validateSignup() {
-      const fullname = document.getElementById('fullname').value;
-      const email = document.getElementById('email').value;
+      const fullname = document.getElementById('fullname').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const confirm = document.getElementById('confirmPassword').value;
       const terms = document.getElementById('terms').checked;
+
       if (password !== confirm) {
         document.getElementById('signupError').innerText = 'Passwords do not match.';
         return false;
       }
+
       if (!terms) {
         document.getElementById('signupError').innerText = 'You must accept the terms and conditions.';
         return false;
       }
+
       let users = JSON.parse(localStorage.getItem('users')) || [];
       if (users.find(u => u.email === email)) {
         document.getElementById('signupError').innerText = 'User already exists.';
         return false;
       }
+
       users.push({ fullname, email, password });
       localStorage.setItem('users', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify({ fullname, email }));
+      localStorage.setItem('session', 'active');
+
       alert('Signup successful!');
-      return true;
+      updateWelcome();
+      redirectViewExpenses();
+      return false;
     }
 
     function validateLogin() {
-      const email = document.getElementById('loginEmail').value;
+      const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
+
       let users = JSON.parse(localStorage.getItem('users')) || [];
       const user = users.find(u => u.email === email && u.password === password);
+
       if (!user) {
         document.getElementById('loginError').innerText = 'Invalid credentials.';
         return false;
       }
+
       localStorage.setItem('currentUser', JSON.stringify(user));
       localStorage.setItem('session', 'active');
+
       alert('Login successful!');
       updateWelcome();
       redirectViewExpenses();
@@ -166,26 +428,45 @@
     function logout() {
       localStorage.removeItem('session');
       localStorage.removeItem('currentUser');
-      alert('Logged out.');
+      alert('Logged out successfully.');
       updateWelcome();
       hideAllSections();
       showLoginForm();
     }
 
     function clearExpenses() {
-      if (confirm('Delete all expenses?')) {
+      if (confirm('Are you sure you want to delete all expenses? This cannot be undone.')) {
         localStorage.removeItem('expenses');
-        alert('All expenses deleted.');
+        alert('All expenses have been deleted.');
       }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       updateWelcome();
+
       if (!localStorage.getItem('session')) {
         showLoginForm();
+      } else {
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage === 'divide.html') {
+          showDividedExpense();
+        }
+      }
+
+      document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 &&
+            !e.target.closest('#mainSidebar') &&
+            !e.target.closest('#mobileMenuButton')) {
+          document.getElementById('mainSidebar').classList.remove('active');
+        }
+      });
+    });
+
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        document.getElementById('mainSidebar').classList.remove('active');
       }
     });
   </script>
 </body>
 </html>
-

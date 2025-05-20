@@ -10,6 +10,8 @@
   <style>
     @keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.05);} }
     .animate-pulse-custom { animation: pulse 2s infinite; }
+    .limit-warning { background-color: #FEF3C7; }
+    .limit-exceeded { background-color: #FEE2E2; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -19,6 +21,38 @@
   </div>
 
   <div class="container mx-auto p-4">
+    <!-- Summary Card -->
+    <div class="bg-white p-4 rounded-lg shadow mb-4">
+      <h2 class="text-lg font-semibold mb-2">Monthly Summary</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-3 rounded-lg" id="monthlySummary">
+          <p>Total: <span id="monthlyTotal">₹0</span></p>
+          <p>Limit: <span id="monthlyLimitDisplay">₹0</span></p>
+          <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+            <div id="monthlyProgress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="p-3 rounded-lg" id="foodSummary">
+          <p>Food: <span id="foodTotal">₹0</span></p>
+          <p>Limit: <span id="foodLimitDisplay">₹0</span></p>
+        </div>
+        <div class="p-3 rounded-lg" id="transportSummary">
+          <p>Transport: <span id="transportTotal">₹0</span></p>
+          <p>Limit: <span id="transportLimitDisplay">₹0</span></p>
+        </div>
+         <!-- Utilities -->
+        <div class="p-3 rounded-lg" id="utilitiesSummary">
+          <p>Utilities: <span id="utilitiesTotal">₹0</span></p>
+          <p>Limit: <span id="utilitiesLimitDisplay">₹0</span></p>
+        </div>
+        <!-- Entertainment -->
+        <div class="p-3 rounded-lg" id="entertainmentSummary">
+          <p>Entertainment: <span id="entertainmentTotal">₹0</span></p>
+          <p>Limit: <span id="entertainmentLimitDisplay">₹0</span></p>
+        </div>
+      </div>
+    </div>
+
     <!-- Animated Card -->
     <div class="flex justify-end mb-4">
       <a href="charts.html" class="relative bg-[#8B78E6] text-white px-6 py-4 rounded-lg shadow-lg animate-pulse-custom hover:shadow-xl transition duration-300">
@@ -38,6 +72,39 @@
       <button id="undoDeleteBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300">
         Undo Delete
       </button>
+      <button id="setCategoryLimitsBtn" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-300">
+        Set Category Limits
+      </button>
+    </div>
+
+    <!-- Set Category Limits Modal -->
+    <div id="setCategoryLimitsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white p-6 rounded shadow-lg w-96">
+        <h2 class="text-xl font-bold mb-4">Set Category Limits</h2>
+        <form id="setCategoryLimitsForm" class="space-y-4">
+          <div>
+            <label for="foodLimit" class="block text-sm font-medium text-gray-700">Food Limit (₹)</label>
+            <input type="number" id="foodLimit" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
+          </div>
+          <div>
+            <label for="transportLimit" class="block text-sm font-medium text-gray-700">Transport Limit (₹)</label>
+            <input type="number" id="transportLimit" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
+          </div>
+          <div>
+            <label for="utilitiesLimit" class="block text-sm font-medium text-gray-700">Utilities Limit (₹)</label>
+            <input type="number" id="utilitiesLimit" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
+          </div>
+          <div>
+            <label for="entertainmentLimit" class="block text-sm font-medium text-gray-700">Entertainment Limit (₹)</label>
+            <input type="number" id="entertainmentLimit" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
+          </div>
+          
+          <div class="flex justify-end space-x-2">
+            <button type="button" id="cancelCategoryLimitsBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+            <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Save</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -72,7 +139,7 @@
             <th class="py-3 px-4 text-left">Name of Expense</th>
             <th class="py-3 px-4 text-left">Category</th>
             <th class="py-3 px-4 text-left">Date</th>
-            <th class="py-3 px-4 text-left">Total Money Spent</th>
+            <th class="py-3 px-4 text-left">Amount</th>
           </tr>
         </thead>
         <tbody id="expenseTableBody"></tbody>
@@ -104,7 +171,7 @@
         </div>
         <div>
           <label for="expenseAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-          <input type="number" id="expenseAmount" required class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
+          <input type="number" id="expenseAmount" required min="0.01" step="0.01" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2" />
         </div>
         <div class="flex justify-end space-x-2">
           <button type="button" id="cancelBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
@@ -115,10 +182,187 @@
   </div>
 
   <script>
-    // Load from localStorage
+    // Initialize variables and load from localStorage
     let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
     let deletedExpenses = JSON.parse(localStorage.getItem('deletedExpenses')) || [];
+    let categoryLimits = JSON.parse(localStorage.getItem('categoryLimits')) || {
+      food: 0,
+      transport: 0,
+      utilities: 0,
+      entertainment: 0,
+    };
+    let monthlyLimit = JSON.parse(localStorage.getItem('monthlyLimit')) || 0;
 
+    // Helper functions
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+    }
+
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('en-US', options);
+    }
+
+    // Save functions
+    function saveExpenses() {
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+    }
+
+    function saveDeletedExpenses() {
+      localStorage.setItem('deletedExpenses', JSON.stringify(deletedExpenses));
+    }
+
+    function saveCategoryLimits(limits) {
+      categoryLimits = limits;
+      localStorage.setItem('categoryLimits', JSON.stringify(categoryLimits));
+      updateSummary();
+    }
+
+    function saveMonthlyLimit(limit) {
+      monthlyLimit = limit;
+      localStorage.setItem('monthlyLimit', JSON.stringify(monthlyLimit));
+      updateSummary();
+    }
+
+    // Quick Sort Implementation
+    function quickSort(array) {
+      if (array.length <= 1) return array;
+
+      const pivot = array[array.length - 1];
+      const left = [];
+      const right = [];
+
+      for (let i = 0; i < array.length - 1; i++) {
+        if (array[i].amount < pivot.amount) {
+          left.push(array[i]);
+        } else {
+          right.push(array[i]);
+        }
+      }
+
+      return [...quickSort(left), pivot, ...quickSort(right)];
+    }
+
+    // Calculate expenses
+    function calculateCategoryMonthlyExpense(category) {
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+
+      return expenses.reduce((total, expense) => {
+        const expenseDate = new Date(expense.date);
+        if (
+          expense.category === category &&
+          expenseDate.getMonth() === currentMonth &&
+          expenseDate.getFullYear() === currentYear
+        ) {
+          return total + expense.amount;
+        }
+        return total;
+      }, 0);
+    }
+   
+      function calculateMonthlyExpense() {
+      const foodTotal = calculateCategoryMonthlyExpense('food');
+      const transportTotal = calculateCategoryMonthlyExpense('transport');
+      const utilitiesTotal = calculateCategoryMonthlyExpense('utilities');
+      const entertainmentTotal = calculateCategoryMonthlyExpense('entertainment');
+
+      return foodTotal + transportTotal + utilitiesTotal + entertainmentTotal;
+    }
+
+    // Update summary display
+   function updateSummary() {
+  const monthlyTotal = calculateMonthlyExpense();
+  const foodTotal = calculateCategoryMonthlyExpense('food');
+  const transportTotal = calculateCategoryMonthlyExpense('transport');
+  const utilitiesTotal = calculateCategoryMonthlyExpense('utilities');
+  const entertainmentTotal = calculateCategoryMonthlyExpense('entertainment');
+
+  // Update displayed totals and limits
+  document.getElementById('foodTotal').textContent = formatCurrency(foodTotal);
+  document.getElementById('foodLimitDisplay').textContent = formatCurrency(categoryLimits.food);
+
+  document.getElementById('transportTotal').textContent = formatCurrency(transportTotal);
+  document.getElementById('transportLimitDisplay').textContent = formatCurrency(categoryLimits.transport);
+
+  document.getElementById('utilitiesTotal').textContent = formatCurrency(utilitiesTotal);
+  document.getElementById('utilitiesLimitDisplay').textContent = formatCurrency(categoryLimits.utilities);
+
+  document.getElementById('entertainmentTotal').textContent = formatCurrency(entertainmentTotal);
+  document.getElementById('entertainmentLimitDisplay').textContent = formatCurrency(categoryLimits.entertainment);
+
+  // Get summary DOM elements
+  const summaries = {
+    food: document.getElementById('foodSummary'),
+    transport: document.getElementById('transportSummary'),
+    utilities: document.getElementById('utilitiesSummary'),
+    entertainment: document.getElementById('entertainmentSummary'),
+    monthly: document.getElementById('monthlySummary')
+  };
+
+  // Reset all classes
+  Object.values(summaries).forEach(el => el?.classList.remove('limit-warning', 'limit-exceeded'));
+
+  // Apply warnings or exceeded classes based on limits
+  const categoryTotals = {
+    food: foodTotal,
+    transport: transportTotal,
+    utilities: utilitiesTotal,
+    entertainment: entertainmentTotal
+  };
+
+  for (const category in categoryTotals) {
+    const total = categoryTotals[category];
+    const limit = categoryLimits[category];
+    const summaryEl = summaries[category];
+
+    if (limit > 0 && summaryEl) {
+      if (total > limit) {
+        summaryEl.classList.add('limit-exceeded');
+      } else if (total > limit * 0.75) {
+        summaryEl.classList.add('limit-warning');
+      }
+    }
+  }
+
+  // Monthly summary updates with dynamic limit
+  const monthlyLimit = Object.values(categoryLimits).reduce(
+    (sum, limit) => sum + (typeof limit === 'number' ? limit : 0),
+    0
+  );
+
+  document.getElementById('monthlyTotal').textContent = formatCurrency(monthlyTotal);
+  document.getElementById('monthlyLimitDisplay').textContent = formatCurrency(monthlyLimit);
+
+  const monthlySummaryEl = summaries.monthly;
+  if (monthlyLimit > 0 && monthlySummaryEl) {
+    if (monthlyTotal > monthlyLimit) {
+      monthlySummaryEl.classList.add('limit-exceeded');
+    } else if (monthlyTotal > monthlyLimit * 0.75) {
+      monthlySummaryEl.classList.add('limit-warning');
+    }
+  }
+
+  // Update progress bar
+  const progressPercent = monthlyLimit > 0 ? Math.min((monthlyTotal / monthlyLimit) * 100, 100) : 0;
+  const progressBar = document.getElementById('monthlyProgress');
+  progressBar.style.width = `${progressPercent}%`;
+  progressBar.className = 'h-2.5 rounded-full';
+
+  if (progressPercent > 100) {
+    progressBar.classList.add('bg-red-600');
+  } else if (progressPercent > 75) {
+    progressBar.classList.add('bg-yellow-500');
+  } else {
+    progressBar.classList.add('bg-blue-600');
+  }
+}
+
+
+
+
+    // DOM Elements
     const expenseTableBody = document.getElementById('expenseTableBody');
     const dateFilter = document.getElementById('dateFilter');
     const categoryFilter = document.getElementById('categoryFilter');
@@ -128,14 +372,39 @@
     const addExpenseModal = document.getElementById('addExpenseModal');
     const cancelBtn = document.getElementById('cancelBtn');
     const expenseForm = document.getElementById('expenseForm');
+    const setCategoryLimitsBtn = document.getElementById('setCategoryLimitsBtn');
+    const setCategoryLimitsModal = document.getElementById('setCategoryLimitsModal');
+    const cancelCategoryLimitsBtn = document.getElementById('cancelCategoryLimitsBtn');
+    const setCategoryLimitsForm = document.getElementById('setCategoryLimitsForm');
 
-    // Persist state
-    function saveState() {
-      localStorage.setItem('expenses', JSON.stringify(expenses));
-      localStorage.setItem('deletedExpenses', JSON.stringify(deletedExpenses));
-    }
+    // Initialize modals
+    setCategoryLimitsBtn.addEventListener('click', () => {
+      document.getElementById('foodLimit').value = categoryLimits.food;
+      document.getElementById('transportLimit').value = categoryLimits.transport;
+      document.getElementById('utilitiesLimit').value = categoryLimits.utilities;
+      document.getElementById('entertainmentLimit').value = categoryLimits.entertainment;
+  
+      setCategoryLimitsModal.classList.remove('hidden');
+    });
 
-    // Render rows
+    cancelCategoryLimitsBtn.addEventListener('click', () => setCategoryLimitsModal.classList.add('hidden'));
+
+    // Save category and monthly limits
+    setCategoryLimitsForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const newLimits = {
+        food: parseFloat(document.getElementById('foodLimit').value) || 0,
+        transport: parseFloat(document.getElementById('transportLimit').value) || 0,
+        utilities: parseFloat(document.getElementById('utilitiesLimit').value) || 0,
+        entertainment: parseFloat(document.getElementById('entertainmentLimit').value) || 0,
+      };
+
+      saveCategoryLimits(newLimits);
+      //saveMonthlyLimit(newMonthlyLimit);
+      setCategoryLimitsModal.classList.add('hidden');
+    });
+
+    // Render expenses
     function renderExpenses(data) {
       expenseTableBody.innerHTML = '';
       data.forEach((exp, idx) => {
@@ -145,24 +414,23 @@
           <td class="py-2 px-4 border-b">${idx + 1}</td>
           <td class="py-2 px-4 border-b">${exp.name}</td>
           <td class="py-2 px-4 border-b">${exp.category}</td>
-          <td class="py-2 px-4 border-b">${exp.date}</td>
-          <td class="py-2 px-4 border-b">₹${exp.amount}</td>
+          <td class="py-2 px-4 border-b">${formatDate(exp.date)}</td>
+          <td class="py-2 px-4 border-b">${formatCurrency(exp.amount)}</td>
         `;
         expenseTableBody.appendChild(row);
       });
     }
 
-    // Filtering logic
+    // Filter expenses
     function filterExpenses() {
       let filtered = [...expenses];
       const cat = categoryFilter.value;
       const dateOpt = dateFilter.value;
       const today = new Date();
-      // Category filter
+
       if (cat !== 'all') {
         filtered = filtered.filter(e => e.category === cat);
       }
-      // Date filter
       if (dateOpt !== 'all') {
         filtered = filtered.filter(e => {
           const d = new Date(e.date);
@@ -177,51 +445,90 @@
           }
         });
       }
-      // Sorting logic
-      if (dateOpt === 'yearly') {
-        // sort by year descending
-        filtered.sort((a, b) => new Date(b.date).getFullYear() - new Date(a.date).getFullYear());
-      } else {
-        // sort by full date descending (latest first)
-        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-      }
       renderExpenses(filtered);
     }
 
     // Event listeners
     dateFilter.addEventListener('change', filterExpenses);
     categoryFilter.addEventListener('change', filterExpenses);
-    addExpenseBtn.addEventListener('click', () => addExpenseModal.classList.remove('hidden'));
+    addExpenseBtn.addEventListener('click', () => {
+      document.getElementById('expenseDate').valueAsDate = new Date();
+      addExpenseModal.classList.remove('hidden');
+    });
     cancelBtn.addEventListener('click', () => addExpenseModal.classList.add('hidden'));
+
+    // Add expense with validation and limit checks
     expenseForm.addEventListener('submit', e => {
       e.preventDefault();
-      const name = document.getElementById('expenseName').value;
+      const name = document.getElementById('expenseName').value.trim();
       const category = document.getElementById('expenseCategory').value;
       const date = document.getElementById('expenseDate').value;
       const amount = parseFloat(document.getElementById('expenseAmount').value);
+
+      // Validate inputs
+      if (!name) {
+        alert("Please enter a name for the expense");
+        return;
+      }
+      if (amount <= 0) {
+        alert("Amount must be positive");
+        return;
+      }
+      
+      const today = new Date();
+      const expenseDate = new Date(date);
+      if (expenseDate > today) {
+        alert("Cannot add expenses for future dates");
+        return;
+      }
+
+      // Check monthly limit
+      const currentTotalMonthlyExpense = calculateMonthlyExpense();
+      if (monthlyLimit > 0 && currentTotalMonthlyExpense + amount > monthlyLimit) {
+        alert(`Monthly expense limit exceeded! Limit: ${formatCurrency(monthlyLimit)}, Current: ${formatCurrency(currentTotalMonthlyExpense)}. Cannot add this expense.`);
+        return;
+      }
+
+      // Check category limit
+      const categoryMonthlyExpense = calculateCategoryMonthlyExpense(category);
+      if (categoryLimits[category] > 0 && categoryMonthlyExpense + amount > categoryLimits[category]) {
+        alert(`Category limit exceeded for ${category}! Limit: ${formatCurrency(categoryLimits[category])}, Current: ${formatCurrency(categoryMonthlyExpense)}`);
+        return;
+      }
+
+      // Add the expense
       expenses.push({ name, category, date, amount });
-      saveState();
+      saveExpenses();
       expenseForm.reset();
       addExpenseModal.classList.add('hidden');
       filterExpenses();
+      updateSummary();
     });
+
+    // Delete and undo-delete
     deleteExpenseBtn.addEventListener('click', () => {
       if (expenses.length) {
         deletedExpenses.push(expenses.pop());
-        saveState();
+        saveExpenses();
+        saveDeletedExpenses();
         filterExpenses();
+        updateSummary();
       }
     });
+    
     undoDeleteBtn.addEventListener('click', () => {
       if (deletedExpenses.length) {
         expenses.push(deletedExpenses.pop());
-        saveState();
+        saveExpenses();
+        saveDeletedExpenses();
         filterExpenses();
+        updateSummary();
       }
     });
 
     // Initial render
     filterExpenses();
+    updateSummary();
   </script>
 </body>
 </html>
