@@ -57,9 +57,8 @@ Expenseo demonstrates practical data structures (arrays, stacks, maps) and algor
 | **Frontend (Web)**   | HTML, CSS, JavaScript, Tailwind CSS |
 | **Charts**           | Chart.js                            |
 | **OCR**              | Tesseract.js                        |
-| **Storage (Web)**    | localStorage (JSON)                 |           |
-| **Desktop (C)**      | C, GTK4, pthreads, Cairo/WebKit     |
-| **Deploy**           | GitHub Pages / Vercel / Netlify     |
+| **Storage (Web)**    | localStorage (JSON)                 |           
+| **Deploy**           | GitHub Pages /      |
 
 ---
 
@@ -78,7 +77,6 @@ Expenseo demonstrates practical data structures (arrays, stacks, maps) and algor
 
 1. **Frontend**: Collects expenses → stores in `localStorage`.
 2. **OCR Module**: Parses bill images via Tesseract.js.
-3. **Sync**: `fetch()` sends JSON to backend on change.
 ---
 
 ## 🚀 Installation & Setup
