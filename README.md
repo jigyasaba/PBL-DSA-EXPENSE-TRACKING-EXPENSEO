@@ -113,7 +113,7 @@ Expenseo demonstrates practical data structures (arrays, stacks, maps) and algor
 
 [![GitHub Pages](https://img.shields.io/badge/Pages-Deployed-blue.svg)](https://jigyasaba.github.io/expenseo/)
 
-🔗 **Live Site**: [https://jigyasaba.github.io/expenseo/](https://jigyasaba.github.io/expenseo/)
+🔗 **Live Site**: [https://jigyasaba.github.io/expenseo/](https://jigyasaba.github.io/PBL-DSA-EXPENSE-TRACKING-EXPENSEO/)
 
 ---
 
