@@ -126,6 +126,8 @@ Expenseo demonstrates practical data structures (arrays, stacks, maps) and algor
 ### Expenses
 
 ![Expenses](docs/assets/Expense1.png)
+
+
 ![Expenses](docs/assets/Expense2.png)
 
 
