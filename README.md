@@ -1,7 +1,7 @@
 # Expenseo – Your Budget Buddy
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub Pages](https://img.shields.io/badge/Pages-Deployed-blue.svg)](https://<your-username>.github.io/expenseo/)
+
 
 **Team Project**:
 
