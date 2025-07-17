@@ -116,6 +116,27 @@ Expenseo demonstrates practical data structures (arrays, stacks, maps) and algor
 🔗 **Live Site**: [https://jigyasaba.github.io/expenseo/](https://jigyasaba.github.io/PBL-DSA-EXPENSE-TRACKING-EXPENSEO/)
 
 ---
+## 🖼️ Screenshots
+
+### Homepage
+
+![Homepage](docs/assets/HomePage.png)
+
+
+### Expenses
+
+![Expenses](docs/assets/Expense1.png)
+![Expenses](docs/assets/Expense2.png)
+
+
+### Summary
+
+![Summary](docs/assets/Summary.png)
+
+
+### Bill Split Feature
+
+![Split Bill](docs/assets/Split.png)
 
 
 ## 🤝 Contributing
