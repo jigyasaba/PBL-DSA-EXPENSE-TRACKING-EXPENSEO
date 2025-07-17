@@ -110,8 +110,12 @@ Expenseo demonstrates practical data structures (arrays, stacks, maps) and algor
 6. **OCR Entry**: **Upload** bill image → form auto‑fills.
 7. **Split Bills**: Navigate to **Split Bill**, enter names/amounts, click **Divide**.
 8. **Export/Email**: **Export CSV** or click **Send Report**.
+   --------
+# Expenseo – Your Budget Buddy
 
-*(Add screenshots/GIFs in `/docs/assets/` and reference below.)*
+[![GitHub Pages](https://img.shields.io/badge/Pages-Deployed-blue.svg)](https://jigyasaba.github.io/expenseo/)
+
+🔗 **Live Site**: [https://jigyasaba.github.io/expenseo/](https://jigyasaba.github.io/expenseo/)
 
 ---
 
