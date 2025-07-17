@@ -75,6 +75,19 @@
       <button id="setCategoryLimitsBtn" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-300">
         Set Category Limits
       </button>
+      <button id="voiceInputBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd" />
+        </svg>
+        Add by Voice
+      </button>
+      <!-- Add Image Button -->
+      <button id="imageInputBtn" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition duration-300 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+        </svg>
+        Add by Image
+      </button>
     </div>
 
     <!-- Set Category Limits Modal -->
@@ -104,6 +117,55 @@
             <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Save</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Voice Input Modal -->
+    <div id="voiceInputModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white p-6 rounded shadow-lg w-96">
+        <h2 class="text-xl font-bold mb-4">Voice Input</h2>
+        <div class="mb-4">
+          <p id="voiceStatus" class="text-gray-600">Click the microphone and speak your expense</p>
+          <div id="voiceFeedback" class="mt-2 p-3 bg-gray-100 rounded min-h-12"></div>
+        </div>
+        <div class="flex justify-center mb-4">
+          <button id="startListeningBtn" class="bg-red-500 text-white p-4 rounded-full hover:bg-red-600 transition duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button id="cancelVoiceBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+          <button id="confirmVoiceBtn" class="bg-[#8B78E6] text-white px-4 py-2 rounded hover:bg-[#7a68d6] hidden">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Input Modal -->
+    <div id="imageInputModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white p-6 rounded shadow-lg w-96">
+        <h2 class="text-xl font-bold mb-4">Add Expense from Bill</h2>
+        <div class="mb-4">
+          <label for="expenseImage" class="block mb-2 text-sm font-medium text-gray-700">
+            Upload bill image
+          </label>
+          <input type="file" id="expenseImage" accept="image/*" class="block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded file:border-0
+            file:text-sm file:font-semibold
+            file:bg-purple-50 file:text-purple-700
+            hover:file:bg-purple-100
+          "/>
+          <div class="mt-4">
+            <img id="imagePreview" class="max-w-full h-auto border rounded hidden"/>
+          </div>
+          <div id="imageProcessingStatus" class="mt-4 text-sm text-gray-600">Upload a clear image of your bill</div>
+        </div>
+        <div class="flex justify-end space-x-2 mt-4">
+          <button id="cancelImageBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+          <button id="processImageBtn" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Process</button>
+        </div>
       </div>
     </div>
 
@@ -181,6 +243,9 @@
     </div>
   </div>
 
+  <!-- Include Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  
   <script>
     // Initialize variables and load from localStorage
     let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
@@ -262,7 +327,7 @@
       }, 0);
     }
    
-      function calculateMonthlyExpense() {
+    function calculateMonthlyExpense() {
       const foodTotal = calculateCategoryMonthlyExpense('food');
       const transportTotal = calculateCategoryMonthlyExpense('transport');
       const utilitiesTotal = calculateCategoryMonthlyExpense('utilities');
@@ -272,95 +337,92 @@
     }
 
     // Update summary display
-   function updateSummary() {
-  const monthlyTotal = calculateMonthlyExpense();
-  const foodTotal = calculateCategoryMonthlyExpense('food');
-  const transportTotal = calculateCategoryMonthlyExpense('transport');
-  const utilitiesTotal = calculateCategoryMonthlyExpense('utilities');
-  const entertainmentTotal = calculateCategoryMonthlyExpense('entertainment');
+    function updateSummary() {
+      const monthlyTotal = calculateMonthlyExpense();
+      const foodTotal = calculateCategoryMonthlyExpense('food');
+      const transportTotal = calculateCategoryMonthlyExpense('transport');
+      const utilitiesTotal = calculateCategoryMonthlyExpense('utilities');
+      const entertainmentTotal = calculateCategoryMonthlyExpense('entertainment');
 
-  // Update displayed totals and limits
-  document.getElementById('foodTotal').textContent = formatCurrency(foodTotal);
-  document.getElementById('foodLimitDisplay').textContent = formatCurrency(categoryLimits.food);
+      // Update displayed totals and limits
+      document.getElementById('foodTotal').textContent = formatCurrency(foodTotal);
+      document.getElementById('foodLimitDisplay').textContent = formatCurrency(categoryLimits.food);
 
-  document.getElementById('transportTotal').textContent = formatCurrency(transportTotal);
-  document.getElementById('transportLimitDisplay').textContent = formatCurrency(categoryLimits.transport);
+      document.getElementById('transportTotal').textContent = formatCurrency(transportTotal);
+      document.getElementById('transportLimitDisplay').textContent = formatCurrency(categoryLimits.transport);
 
-  document.getElementById('utilitiesTotal').textContent = formatCurrency(utilitiesTotal);
-  document.getElementById('utilitiesLimitDisplay').textContent = formatCurrency(categoryLimits.utilities);
+      document.getElementById('utilitiesTotal').textContent = formatCurrency(utilitiesTotal);
+      document.getElementById('utilitiesLimitDisplay').textContent = formatCurrency(categoryLimits.utilities);
 
-  document.getElementById('entertainmentTotal').textContent = formatCurrency(entertainmentTotal);
-  document.getElementById('entertainmentLimitDisplay').textContent = formatCurrency(categoryLimits.entertainment);
+      document.getElementById('entertainmentTotal').textContent = formatCurrency(entertainmentTotal);
+      document.getElementById('entertainmentLimitDisplay').textContent = formatCurrency(categoryLimits.entertainment);
 
-  // Get summary DOM elements
-  const summaries = {
-    food: document.getElementById('foodSummary'),
-    transport: document.getElementById('transportSummary'),
-    utilities: document.getElementById('utilitiesSummary'),
-    entertainment: document.getElementById('entertainmentSummary'),
-    monthly: document.getElementById('monthlySummary')
-  };
+      // Get summary DOM elements
+      const summaries = {
+        food: document.getElementById('foodSummary'),
+        transport: document.getElementById('transportSummary'),
+        utilities: document.getElementById('utilitiesSummary'),
+        entertainment: document.getElementById('entertainmentSummary'),
+        monthly: document.getElementById('monthlySummary')
+      };
 
-  // Reset all classes
-  Object.values(summaries).forEach(el => el?.classList.remove('limit-warning', 'limit-exceeded'));
+      // Reset all classes
+      Object.values(summaries).forEach(el => el?.classList.remove('limit-warning', 'limit-exceeded'));
 
-  // Apply warnings or exceeded classes based on limits
-  const categoryTotals = {
-    food: foodTotal,
-    transport: transportTotal,
-    utilities: utilitiesTotal,
-    entertainment: entertainmentTotal
-  };
+      // Apply warnings or exceeded classes based on limits
+      const categoryTotals = {
+        food: foodTotal,
+        transport: transportTotal,
+        utilities: utilitiesTotal,
+        entertainment: entertainmentTotal
+      };
 
-  for (const category in categoryTotals) {
-    const total = categoryTotals[category];
-    const limit = categoryLimits[category];
-    const summaryEl = summaries[category];
+      for (const category in categoryTotals) {
+        const total = categoryTotals[category];
+        const limit = categoryLimits[category];
+        const summaryEl = summaries[category];
 
-    if (limit > 0 && summaryEl) {
-      if (total > limit) {
-        summaryEl.classList.add('limit-exceeded');
-      } else if (total > limit * 0.75) {
-        summaryEl.classList.add('limit-warning');
+        if (limit > 0 && summaryEl) {
+          if (total > limit) {
+            summaryEl.classList.add('limit-exceeded');
+          } else if (total > limit * 0.75) {
+            summaryEl.classList.add('limit-warning');
+          }
+        }
+      }
+
+      // Monthly summary updates with dynamic limit
+      const monthlyLimit = Object.values(categoryLimits).reduce(
+        (sum, limit) => sum + (typeof limit === 'number' ? limit : 0),
+        0
+      );
+
+      document.getElementById('monthlyTotal').textContent = formatCurrency(monthlyTotal);
+      document.getElementById('monthlyLimitDisplay').textContent = formatCurrency(monthlyLimit);
+
+      const monthlySummaryEl = summaries.monthly;
+      if (monthlyLimit > 0 && monthlySummaryEl) {
+        if (monthlyTotal > monthlyLimit) {
+          monthlySummaryEl.classList.add('limit-exceeded');
+        } else if (monthlyTotal > monthlyLimit * 0.75) {
+          monthlySummaryEl.classList.add('limit-warning');
+        }
+      }
+
+      // Update progress bar
+      const progressPercent = monthlyLimit > 0 ? Math.min((monthlyTotal / monthlyLimit) * 100, 100) : 0;
+      const progressBar = document.getElementById('monthlyProgress');
+      progressBar.style.width = `${progressPercent}%`;
+      progressBar.className = 'h-2.5 rounded-full';
+
+      if (progressPercent > 100) {
+        progressBar.classList.add('bg-red-600');
+      } else if (progressPercent > 75) {
+        progressBar.classList.add('bg-yellow-500');
+      } else {
+        progressBar.classList.add('bg-blue-600');
       }
     }
-  }
-
-  // Monthly summary updates with dynamic limit
-  const monthlyLimit = Object.values(categoryLimits).reduce(
-    (sum, limit) => sum + (typeof limit === 'number' ? limit : 0),
-    0
-  );
-
-  document.getElementById('monthlyTotal').textContent = formatCurrency(monthlyTotal);
-  document.getElementById('monthlyLimitDisplay').textContent = formatCurrency(monthlyLimit);
-
-  const monthlySummaryEl = summaries.monthly;
-  if (monthlyLimit > 0 && monthlySummaryEl) {
-    if (monthlyTotal > monthlyLimit) {
-      monthlySummaryEl.classList.add('limit-exceeded');
-    } else if (monthlyTotal > monthlyLimit * 0.75) {
-      monthlySummaryEl.classList.add('limit-warning');
-    }
-  }
-
-  // Update progress bar
-  const progressPercent = monthlyLimit > 0 ? Math.min((monthlyTotal / monthlyLimit) * 100, 100) : 0;
-  const progressBar = document.getElementById('monthlyProgress');
-  progressBar.style.width = `${progressPercent}%`;
-  progressBar.className = 'h-2.5 rounded-full';
-
-  if (progressPercent > 100) {
-    progressBar.classList.add('bg-red-600');
-  } else if (progressPercent > 75) {
-    progressBar.classList.add('bg-yellow-500');
-  } else {
-    progressBar.classList.add('bg-blue-600');
-  }
-}
-
-
-
 
     // DOM Elements
     const expenseTableBody = document.getElementById('expenseTableBody');
@@ -376,6 +438,270 @@
     const setCategoryLimitsModal = document.getElementById('setCategoryLimitsModal');
     const cancelCategoryLimitsBtn = document.getElementById('cancelCategoryLimitsBtn');
     const setCategoryLimitsForm = document.getElementById('setCategoryLimitsForm');
+
+    // Voice Input Elements
+    const voiceInputBtn = document.getElementById('voiceInputBtn');
+    const voiceInputModal = document.getElementById('voiceInputModal');
+    const startListeningBtn = document.getElementById('startListeningBtn');
+    const cancelVoiceBtn = document.getElementById('cancelVoiceBtn');
+    const confirmVoiceBtn = document.getElementById('confirmVoiceBtn');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceFeedback = document.getElementById('voiceFeedback');
+    
+    let recognition;
+    let voiceExpenseData = {
+      name: '',
+      category: 'food',
+      amount: 0,
+      date: new Date().toISOString().split('T')[0]
+    };
+
+    // Image Input Elements
+    const imageInputBtn = document.getElementById('imageInputBtn');
+    const imageInputModal = document.getElementById('imageInputModal');
+    const expenseImage = document.getElementById('expenseImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const processImageBtn = document.getElementById('processImageBtn');
+    const cancelImageBtn = document.getElementById('cancelImageBtn');
+    const imageProcessingStatus = document.getElementById('imageProcessingStatus');
+
+    // Initialize image input
+    expenseImage.addEventListener('change', function(e) {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.classList.remove('hidden');
+          imageProcessingStatus.textContent = "Click 'Process' to extract bill details";
+        }
+        
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+
+    // Process image with Tesseract
+    processImageBtn.addEventListener('click', async () => {
+      if (!expenseImage.files[0]) {
+        imageProcessingStatus.textContent = "Please select an image first";
+        return;
+      }
+      
+      imageProcessingStatus.textContent = "Processing bill...";
+      
+      try {
+        const worker = await Tesseract.createWorker();
+        await worker.loadLanguage('eng');
+        await worker.initialize('eng');
+        
+        const { data: { text } } = await worker.recognize(expenseImage.files[0]);
+        await worker.terminate();
+        
+        // Parse the extracted text for amount and category
+        const parsedData = parseBillText(text);
+        
+        if (parsedData.amount > 0) {
+          // Pre-fill the add expense form
+          document.getElementById('expenseName').value = "Bill Payment";
+          document.getElementById('expenseCategory').value = parsedData.category;
+          document.getElementById('expenseDate').valueAsDate = new Date();
+          document.getElementById('expenseAmount').value = parsedData.amount;
+          
+          // Close modals and open add expense form
+          imageInputModal.classList.add('hidden');
+          addExpenseModal.classList.remove('hidden');
+          
+          imageProcessingStatus.textContent = "Details extracted successfully!";
+        } else {
+          imageProcessingStatus.textContent = "Couldn't find amount. Please add manually.";
+        }
+        
+      } catch (error) {
+        imageProcessingStatus.textContent = `Error: ${error.message}`;
+        console.error('OCR Error:', error);
+      }
+    });
+
+    // Parse bill text to extract amount and category
+    function parseBillText(text) {
+      let amount = 0;
+      let category = "utilities"; // Default category
+      
+      // Amount extraction - look for currency patterns
+      const amountRegex = /(?:total|amount|bal|due|rs?\.?)\s*[:=\-]?\s*[₹]?\s*(\d+[\.,]?\d*\.?\d+)/gi;
+      let amountMatch;
+      
+      // Look for amounts in the format that typically represent totals
+      while ((amountMatch = amountRegex.exec(text)) !== null) {
+        const potentialAmount = parseFloat(amountMatch[1].replace(',', ''));
+        if (potentialAmount > amount) {
+          amount = potentialAmount; // Take the largest amount found (likely the total)
+        }
+      }
+      
+      // Category detection based on keywords
+      const lowerText = text.toLowerCase();
+      if (lowerText.includes('electric') || lowerText.includes('power') || 
+          lowerText.includes('water') || lowerText.includes('gas')) {
+        category = "utilities";
+      } else if (lowerText.includes('restaurant') || lowerText.includes('cafe') || 
+                 lowerText.includes('food') || lowerText.includes('dining')) {
+        category = "food";
+      } else if (lowerText.includes('fuel') || lowerText.includes('petrol') || 
+                 lowerText.includes('diesel') || lowerText.includes('auto')) {
+        category = "transport";
+      } else if (lowerText.includes('movie') || lowerText.includes('stream') || 
+                 lowerText.includes('entertain') || lowerText.includes('game')) {
+        category = "entertainment";
+      }
+      
+      return { amount, category };
+    }
+
+    // Event listeners for image input
+    imageInputBtn.addEventListener('click', () => {
+      imageInputModal.classList.remove('hidden');
+      imagePreview.classList.add('hidden');
+      imageProcessingStatus.textContent = "Upload a clear image of your bill";
+      expenseImage.value = '';
+    });
+
+    cancelImageBtn.addEventListener('click', () => {
+      imageInputModal.classList.add('hidden');
+    });
+
+    // Initialize speech recognition
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
+        voiceInputBtn.disabled = true;
+        voiceInputBtn.title = "Speech recognition not supported in your browser";
+        return;
+      }
+      
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      
+      recognition.onstart = () => {
+        voiceStatus.textContent = "Listening... Speak now";
+        startListeningBtn.classList.add('animate-pulse');
+      };
+      
+      recognition.onerror = (event) => {
+        voiceStatus.textContent = `Error occurred: ${event.error}`;
+        startListeningBtn.classList.remove('animate-pulse');
+      };
+      
+      recognition.onend = () => {
+        startListeningBtn.classList.remove('animate-pulse');
+        if (voiceExpenseData.name && voiceExpenseData.amount) {
+          confirmVoiceBtn.classList.remove('hidden');
+        }
+      };
+      
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0])
+          .map(result => result.transcript)
+          .join('');
+        
+        voiceFeedback.textContent = transcript;
+        parseVoiceCommand(transcript);
+      };
+    }
+    
+    // Parse voice command to extract expense details
+    function parseVoiceCommand(transcript) {
+      // Reset previous data
+      voiceExpenseData = {
+        name: '',
+        category: 'food',
+        amount: 0,
+        date: new Date().toISOString().split('T')[0]
+      };
+      
+      // Extract amount (look for numbers)
+      const amountMatch = transcript.match(/\d+(\.\d{1,2})?/);
+      if (amountMatch) {
+        voiceExpenseData.amount = parseFloat(amountMatch[0]);
+      }
+      
+      // Extract category (look for keywords)
+      const lowerTranscript = transcript.toLowerCase();
+      if (lowerTranscript.includes('transport') || lowerTranscript.includes('travel') || lowerTranscript.includes('bus') || lowerTranscript.includes('taxi')) {
+        voiceExpenseData.category = 'transport';
+      } else if (lowerTranscript.includes('utility') || lowerTranscript.includes('bill') || lowerTranscript.includes('electric') || lowerTranscript.includes('water')) {
+        voiceExpenseData.category = 'utilities';
+      } else if (lowerTranscript.includes('entertain') || lowerTranscript.includes('movie') || lowerTranscript.includes('game')) {
+        voiceExpenseData.category = 'entertainment';
+      }
+      
+      // The rest is assumed to be the name
+      let name = transcript;
+      if (amountMatch) {
+        name = name.replace(amountMatch[0], '').trim();
+      }
+      name = name.replace(/transport|travel|bus|taxi|utility|bill|electric|water|entertain|movie|game/gi, '').trim();
+      voiceExpenseData.name = name || 'Miscellaneous';
+      
+      // Update UI to show parsed data
+      if (voiceExpenseData.name && voiceExpenseData.amount) {
+        voiceStatus.innerHTML = `
+          <strong>Parsed Expense:</strong><br>
+          Name: ${voiceExpenseData.name}<br>
+          Category: ${voiceExpenseData.category}<br>
+          Amount: ₹${voiceExpenseData.amount.toFixed(2)}<br>
+          Date: ${formatDate(voiceExpenseData.date)}
+        `;
+      }
+    }
+
+    // Event listeners for voice input
+    voiceInputBtn.addEventListener('click', () => {
+      voiceInputModal.classList.remove('hidden');
+      voiceStatus.textContent = "Click the microphone and speak your expense";
+      voiceFeedback.textContent = '';
+      confirmVoiceBtn.classList.add('hidden');
+      voiceExpenseData = {
+        name: '',
+        category: 'food',
+        amount: 0,
+        date: new Date().toISOString().split('T')[0]
+      };
+    });
+    
+    startListeningBtn.addEventListener('click', () => {
+      if (recognition) {
+        recognition.start();
+      }
+    });
+    
+    cancelVoiceBtn.addEventListener('click', () => {
+      voiceInputModal.classList.add('hidden');
+      if (recognition) {
+        recognition.stop();
+      }
+    });
+    
+    confirmVoiceBtn.addEventListener('click', () => {
+      if (voiceExpenseData.name && voiceExpenseData.amount > 0) {
+        // Add the expense
+        expenses.push({
+          name: voiceExpenseData.name,
+          category: voiceExpenseData.category,
+          date: voiceExpenseData.date,
+          amount: voiceExpenseData.amount
+        });
+        
+        saveExpenses();
+        voiceInputModal.classList.add('hidden');
+        filterExpenses();
+        updateSummary();
+      }
+    });
 
     // Initialize modals
     setCategoryLimitsBtn.addEventListener('click', () => {
@@ -400,7 +726,6 @@
       };
 
       saveCategoryLimits(newLimits);
-      //saveMonthlyLimit(newMonthlyLimit);
       setCategoryLimitsModal.classList.add('hidden');
     });
 
@@ -525,6 +850,9 @@
         updateSummary();
       }
     });
+
+    // Initialize speech recognition when page loads
+    initSpeechRecognition();
 
     // Initial render
     filterExpenses();
