@@ -4,26 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Expenseo - The Budget Buddy</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&display=swap');
+  <style> @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Arial', sans-serif; background-color: #f3f4f6; display: flex; height: 100vh; position: relative; overflow: hidden; }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* keep body fixed */
+    }
+
     .background-video { 
       position: fixed; 
       top: 50%;
       left: 50%;
       min-width: 100%; 
       min-height: 100%; 
+
       width: auto;
       height: auto;
       transform: translate(-50%, -50%);
       object-fit: contain; 
       z-index: -1; 
-      opacity: 0.8; 
-        }
-    header { width: 100%; text-align: center; padding: 20px 0; background: rgba(255,255,255,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; z-index: 1; }
-    h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; color: #2c3e50; }
-    #welcomeMessage { font-size: 1.2rem; color: #555; margin-top: 5px; }
+      opacity: 0.8;
+    }
+
+    header { 
+      width: 100%; 
+      text-align: center; 
+      padding: 20px 0; 
+      background: rgba(255,255,255,0.8); 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      z-index: 1; 
+    }
+
+    h1 { 
+      font-family: 'Playfair Display', serif; 
+      font-size: 2.5rem; 
+      font-style: italic; 
+      color: #2c3e50; 
+    }
+
+    #welcomeMessage { 
+      font-size: 1.2rem; 
+      color: #555; 
+      margin-top: 5px; 
+    }
 
     .sidebar {
       position: fixed;
@@ -84,9 +114,10 @@
 
     .main-content {
       margin-left: 220px;
-      padding: 140px 20px 20px;
+      padding: 140px 20px 80px; /* space for header + footer */
       width: calc(100% - 220px);
-      min-height: calc(100vh - 60px);
+      height: calc(100vh - 140px); /* scrollable section */
+      overflow-y: auto;
     }
 
     form, .page-section {
@@ -95,7 +126,7 @@
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.15);
       max-width: 500px;
-      margin: 0 auto;
+      margin: 0 auto 40px;
       animation: zoomIn 0.3s ease;
     }
 
